@@ -106,51 +106,7 @@ public class TopTitles extends Configured implements Tool {
         }
     }
 // <<< Don't Change
-
-    public static class TitleCountMap extends Mapper<Object, Text, Text, IntWritable> {
-        List<String> stopWords;
-        String delimiters;
-
-        @Override
-        protected void setup(Context context) throws IOException,InterruptedException {
-
-            Configuration conf = context.getConfiguration();
-
-            String stopWordsPath = conf.get("stopwords");
-            String delimitersPath = conf.get("delimiters");
-
-            this.stopWords = Arrays.asList(readHDFSFile(stopWordsPath, conf).split("\n"));
-            this.delimiters = readHDFSFile(delimitersPath, conf);
-        }
-
-
-        @Override
-        public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-			String line = value.toString();
-			StringTokenizer tokenizer = new StringTokenizer(line,delimiters, false);
-			while (tokenizer.hasMoreTokens()) {
-				String nextToken = tokenizer.nextToken().trim().toLowerCase();
-				//checking whether word exists in StopWordList
-				if(!stopWords.contains(nextToken))
-				{
-					//if not
-					context.write(new Text(nextToken), new IntWritable(1));
-				}
-			}
-        }
-    }
-
-    public static class TitleCountReduce extends Reducer<Text, IntWritable, Text, IntWritable> {
-        @Override
-        public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
-            int sum = 0;
-			for (IntWritable val : values) {
-				sum += val.get();
-			}
-			context.write(key, new IntWritable(sum));
-        }
-    }
-
+   
     public static class TopTitlesMap extends Mapper<Text, Text, NullWritable, TextArrayWritable> {
         Integer N;
         private TreeSet<Pair<Integer, String>> countToWordMap = new TreeSet<Pair<Integer, String>>();
