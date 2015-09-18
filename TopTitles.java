@@ -41,20 +41,7 @@ public class TopTitles extends Configured implements Tool {
         FileSystem fs = FileSystem.get(conf);
         Path tmpPath = new Path("/mp2/tmp");
         fs.delete(tmpPath, true);
-
-        Job jobA = Job.getInstance(conf, "Title Count");
-        jobA.setOutputKeyClass(Text.class);
-        jobA.setOutputValueClass(IntWritable.class);
-
-        jobA.setMapperClass(TitleCountMap.class);
-        jobA.setReducerClass(TitleCountReduce.class);
-
-        FileInputFormat.setInputPaths(jobA, new Path(args[0]));
-        FileOutputFormat.setOutputPath(jobA, tmpPath);
-
-        jobA.setJarByClass(TopTitles.class);
-        jobA.waitForCompletion(true);
-
+					
         Job jobB = Job.getInstance(conf, "Top Titles");
         jobB.setOutputKeyClass(Text.class);
         jobB.setOutputValueClass(IntWritable.class);
@@ -106,7 +93,7 @@ public class TopTitles extends Configured implements Tool {
         }
     }
 // <<< Don't Change
-   
+
     public static class TopTitlesMap extends Mapper<Text, Text, NullWritable, TextArrayWritable> {
         Integer N;
         private TreeSet<Pair<Integer, String>> countToWordMap = new TreeSet<Pair<Integer, String>>();
@@ -125,7 +112,7 @@ public class TopTitles extends Configured implements Tool {
 
             countToWordMap.add(new Pair<Integer, String>(count, word));
 
-            if (countToWordMap.size() > 5) {
+            if (countToWordMap.size() > this.N) {
                 countToWordMap.remove(countToWordMap.first());
             }
         }
@@ -160,7 +147,7 @@ public class TopTitles extends Configured implements Tool {
 
                 countToWordMap.add(new Pair<Integer, String>(count, word));
 
-                if (countToWordMap.size() > 5) {
+                if (countToWordMap.size() > this.N) {
                     countToWordMap.remove(countToWordMap.first());
                 }
             }
