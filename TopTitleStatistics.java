@@ -211,15 +211,17 @@ public class TopTitleStatistics extends Configured implements Tool {
                 }
             }
 			
-			Set<Integer> keys = countToWordMap.keySet();
+			max = countToWordMap.last().first;
+			min = countToWordMap.first().first;
+			
+			Pair[] pairs = countToWordMap.toArray();			
+			Set<Integer> keys = pairs.first();
 			Statistics stat = new Statistics( keys.toArray( new Integer[keys.size()] ) );
 			
 			sum = stat.getSum();
 			mean = stat.getMean();
-			max = countToWordMap.lastKey();
-			min = countToWordMap.firstKey();
-			var = stat.getVariance();
-
+			var = stat.getVariance();		
+			
             context.write(new Text("Mean"), new IntWritable(mean));
             context.write(new Text("Sum"), new IntWritable(sum));
             context.write(new Text("Min"), new IntWritable(min));
