@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
+import java.util.Set;
 
 // Don't Change >>>
 public class TopTitleStatistics extends Configured implements Tool {
@@ -210,8 +211,8 @@ public class TopTitleStatistics extends Configured implements Tool {
                 }
             }
 			
-			Set<Integer> keys = map.keySet();
-			Statistics stat = new Statistics( keys.toArray(new Integer[keys.size()]); );
+			Set<Integer> keys = countToWordMap.keySet();
+			Statistics stat = new Statistics( keys.toArray( new Integer[keys.size()] ) );
 			
 			sum = stat.getSum();
 			mean = stat.getMean();
@@ -228,7 +229,7 @@ public class TopTitleStatistics extends Configured implements Tool {
     }
 }
 
-public class Statistics 
+class Statistics 
 {
     Integer[] data;
     int size;   
