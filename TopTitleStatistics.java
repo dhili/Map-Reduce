@@ -214,9 +214,16 @@ public class TopTitleStatistics extends Configured implements Tool {
 			max = countToWordMap.last().first;
 			min = countToWordMap.first().first;
 			
-			Pair[] pairs = countToWordMap.toArray();			
-			Set<Integer> keys = pairs.first();
-			Statistics stat = new Statistics( keys.toArray( new Integer[keys.size()] ) );
+			Pair[] pairs = countToWordMap.toArray( new Pair[countToWordMap.size()] );	
+			Integer[] data = new Integer[this.N];
+
+			int offset = 0;	
+			for ( Pair pair : pairs ) {
+				data[offset] = pair.first(); // s is a Scanner object
+				offset++;
+			}
+			
+			Statistics stat = new Statistics(data);
 			
 			sum = stat.getSum();
 			mean = stat.getMean();
