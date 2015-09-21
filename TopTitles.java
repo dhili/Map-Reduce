@@ -39,9 +39,22 @@ public class TopTitles extends Configured implements Tool {
     public int run(String[] args) throws Exception {
         Configuration conf = this.getConf();
         FileSystem fs = FileSystem.get(conf);
-        Path tmpPath = new Path("/mp2/titles");
+        Path tmpPath = new Path("/mp2/tmp");
         fs.delete(tmpPath, true);
-					
+
+        Job jobA = Job.getInstance(conf, "Title Count");
+        jobA.setOutputKeyClass(Text.class);
+        jobA.setOutputValueClass(IntWritable.class);
+
+        jobA.setMapperClass(TitleCountMap.class);
+        jobA.setReducerClass(TitleCountReduce.class);
+
+        FileInputFormat.setInputPaths(jobA, new Path(args[0]));
+        FileOutputFormat.setOutputPath(jobA, tmpPath);
+
+        jobA.setJarByClass(TopTitles.class);
+        jobA.waitForCompletion(true);
+
         Job jobB = Job.getInstance(conf, "Top Titles");
         jobB.setOutputKeyClass(Text.class);
         jobB.setOutputValueClass(IntWritable.class);
@@ -94,10 +107,53 @@ public class TopTitles extends Configured implements Tool {
     }
 // <<< Don't Change
 
+    public static class TitleCountMap extends Mapper<Object, Text, Text, IntWritable> {
+        List<String> stopWords;
+        String delimiters;
+
+        @Override
+        protected void setup(Context context) throws IOException,InterruptedException {
+
+            Configuration conf = context.getConfiguration();
+
+            String stopWordsPath = conf.get("stopwords");
+            String delimitersPath = conf.get("delimiters");
+
+            this.stopWords = Arrays.asList(readHDFSFile(stopWordsPath, conf).split("\n"));
+            this.delimiters = readHDFSFile(delimitersPath, conf);
+        }
+
+
+        @Override
+        public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+			String line = value.toString();
+			StringTokenizer tokenizer = new StringTokenizer(line,delimiters, false);
+			while (tokenizer.hasMoreTokens()) {
+				String nextToken = tokenizer.nextToken().trim().toLowerCase();
+				//checking whether word exists in StopWordList
+				if(!stopWords.contains(nextToken))
+				{
+					//if not
+					context.write(new Text(nextToken), new IntWritable(1));
+				}
+			}
+        }
+    }
+
+    public static class TitleCountReduce extends Reducer<Text, IntWritable, Text, IntWritable> {
+        @Override
+        public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
+            int sum = 0;
+			for (IntWritable val : values) {
+				sum += val.get();
+			}
+			context.write(key, new IntWritable(sum));
+        }
+    }
+
     public static class TopTitlesMap extends Mapper<Text, Text, NullWritable, TextArrayWritable> {
         Integer N;
         private TreeSet<Pair<Integer, String>> countToWordMap = new TreeSet<Pair<Integer, String>>();
-
 
         @Override
         protected void setup(Context context) throws IOException,InterruptedException {
@@ -131,6 +187,7 @@ public class TopTitles extends Configured implements Tool {
         Integer N;
         private TreeSet<Pair<Integer, String>> countToWordMap = new TreeSet<Pair<Integer, String>>();
 
+
         @Override
         protected void setup(Context context) throws IOException,InterruptedException {
             Configuration conf = context.getConfiguration();
@@ -139,7 +196,7 @@ public class TopTitles extends Configured implements Tool {
 
         @Override
         public void reduce(NullWritable key, Iterable<TextArrayWritable> values, Context context) throws IOException, InterruptedException {
-            for (TextArrayWritable val: values) {
+             for (TextArrayWritable val: values) {
                 Text[] pair= (Text[]) val.toArray();
 
                 String word = pair[0].toString();
