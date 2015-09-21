@@ -219,7 +219,7 @@ public class TopTitleStatistics extends Configured implements Tool {
 
 			int offset = 0;	
 			for ( Pair pair : pairs ) {
-				data[offset] = pair.first; // s is a Scanner object
+				data[offset] = Integer.parseInt(pair.first.toString()); 
 				offset++;
 			}
 			
