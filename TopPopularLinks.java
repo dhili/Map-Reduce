@@ -171,14 +171,15 @@ public class TopPopularLinks extends Configured implements Tool {
         public void reduce(NullWritable key, Iterable<IntArrayWritable> values, Context context) throws IOException, InterruptedException {
              
 			 for (IntArrayWritable val: values) {
-                Integer[] pair= (Integer[]) val.toArray();
-
-                Integer page = Integer.parseInt(pair[0].toString());
-                Integer count = Integer.parseInt(pair[1].toString());
+                
+				IntWritable[] valueArray = (IntWritable[])val.toArray();
+				
+                Integer page = valueArray[0].get();
+                Integer count = valueArray[1].get();
 
                 countToWordMap.add(new Pair<Integer, Integer>(count, page));
-
-                if (countToWordMap.size() > this.N) {
+				                
+				if (countToWordMap.size() > this.N) {
                     countToWordMap.remove(countToWordMap.first());
                 }
             }
