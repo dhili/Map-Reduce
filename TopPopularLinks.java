@@ -150,7 +150,7 @@ public class TopPopularLinks extends Configured implements Tool {
         protected void cleanup(Context context) throws IOException, InterruptedException {
             for (Pair<Integer, Integer> item : countToWordMap) {
                 Integer[] strings = {item.second, item.first};
-                TextArrayWritable val = new IntArrayWritable(strings);
+                IntArrayWritable val = new IntArrayWritable(strings);
                 context.write(NullWritable.get(), val);
 			}
         }
