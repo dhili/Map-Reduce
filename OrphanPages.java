@@ -49,7 +49,7 @@ public class OrphanPages extends Configured implements Tool {
 		@Override
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
             
-			String[] keyvalues = value.getValue().split(":");
+			String[] keyvalues = value.toString().split(":");
 			String[] values = keyvalues[1].split(" ");
 			
 			context.write(new IntWritable( Integer.parseInt(keyvalues[0]) ), new IntWritable(0));
@@ -62,7 +62,7 @@ public class OrphanPages extends Configured implements Tool {
         }
     }
 
-    public static class OrphanPageReduce extends Reducer<IntWritable, IntWritable, IntWritable, NullWritable> {
+    public static class OrphanPageReduce extends Reducer<IntWritable, IntWritable, IntWritable, IntWritable> {
         
 		@Override
         public void reduce(IntWritable key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
