@@ -32,9 +32,6 @@ public class OrphanPages extends Configured implements Tool {
 		job.setOutputKeyClass(IntWritable.class);
         job.setOutputValueClass(IntWritable.class);
 
-        //job.setMapOutputKeyClass(Text.class);
-        //job.setMapOutputValueClass(IntWritable.class);
-
         job.setMapperClass(LinkCountMap.class);
         job.setReducerClass(OrphanPageReduce.class);
 
@@ -63,7 +60,7 @@ public class OrphanPages extends Configured implements Tool {
         }
     }
 
-    public static class OrphanPageReduce extends Reducer<IntWritable, IntWritable, IntWritable, IntWritable> {
+    public static class OrphanPageReduce extends Reducer<IntWritable, IntWritable, IntWritable, NullWritable> {
         
 		@Override
         public void reduce(IntWritable key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
@@ -73,7 +70,7 @@ public class OrphanPages extends Configured implements Tool {
 			}
 			
 			if(sum==0)
-				context.write(key, new IntWritable(sum));
+				context.write(key, NullWritable.get());
         }
     }
 }
