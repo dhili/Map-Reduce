@@ -28,11 +28,12 @@ public class OrphanPages extends Configured implements Tool {
     public int run(String[] args) throws Exception {
         
 		Job job = Job.getInstance(this.getConf(), "Orphan Pages");
-        job.setOutputKeyClass(Text.class);
+        
+		job.setOutputKeyClass(IntWritable.class);
         job.setOutputValueClass(IntWritable.class);
 
-        job.setMapOutputKeyClass(Text.class);
-        job.setMapOutputValueClass(IntWritable.class);
+        //job.setMapOutputKeyClass(Text.class);
+        //job.setMapOutputValueClass(IntWritable.class);
 
         job.setMapperClass(LinkCountMap.class);
         job.setReducerClass(OrphanPageReduce.class);
