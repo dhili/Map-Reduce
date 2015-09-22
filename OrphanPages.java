@@ -49,7 +49,7 @@ public class OrphanPages extends Configured implements Tool {
 		@Override
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
             
-			String[] keyvalues = value.split(":");
+			String[] keyvalues = value.getValue().split(":");
 			String[] values = keyvalues[1].split(" ");
 			
 			context.write(new IntWritable( Integer.parseInt(keyvalues[0]) ), new IntWritable(0));
